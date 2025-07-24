@@ -1,0 +1,102 @@
+# 应用服务 WEB 访问端口
+server:
+  port: 8123
+  servlet:
+    context-path: /api
+    # cookie 30天过期
+    session:
+      cookie:
+        max-age: 2592000
+
+# 项目名称
+spring:
+  application:
+    name: qian-picture-backend
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://xxx/qian_picture
+    username: xxx
+    password: xxx
+  # redis配置
+  redis:
+    host: xxx
+    port: 6379
+    password:
+    database: 2
+    timeout: 5000ms
+  # 开放更大的文件上传体积（默认是1MB）
+  servlet:
+    multipart:
+      max-file-size: 10MB
+  # 分布式session
+  session:
+    store-type: redis
+    # session失效时间30天，单位为秒
+    timeout: 2592000
+  # 空间图片分表
+  shardingsphere:
+    datasource:
+      names: qian_picture
+      qian_picture:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://xxx/qian_picture
+        username: xxx
+        password: xxx
+    rules:
+      sharding:
+        tables:
+          picture:
+            actual-data-nodes: qian_picture.picture  # 动态分表
+            table-strategy:
+              standard:
+                sharding-column: spaceId  # 按照spaceId这一列进行分表
+                sharding-algorithm-name: picture_sharding_algorithm  # 使用自定义分片算法
+        sharding-algorithms:
+          picture_sharding_algorithm:
+            type: CLASS_BASED
+            props:
+              strategy: standard
+              algorithmClassName: com.siqian.qianpicturebackend.manager.sharding.PictureShardingAlgorithm
+    props:
+      sql-show: true  # 开启SQL打印(生产环境不建议)
+
+
+
+
+# MybatisPlus
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**.xml
+  configuration:
+    # MyBatis 配置是否下划映射驼峰
+    map-underscore-to-camel-case: false
+    # 仅在开发环节打印日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    # 逻辑删除
+    db-config:
+      # 指定逻辑删除字段
+      logic-delete-field: isDelete
+      # 指定逻辑删除值
+      logic-not-delete-value: 0  # 未删除
+      logic-delete-value: 1  # 已删除
+    enable-sql-runner: true
+
+# 腾讯cos对象存储配置
+cos:
+  client:
+    # 对象存储访问域名
+    host: xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    # 腾讯云账号 SecretId
+    secretId: xxxxxxxxxxxxxxxxxxxxx
+    # 腾讯云账号 SecretKey
+    secretKey: xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    # 存储桶所在地域
+    region: xxxxxxxxxxxxxxxxxxxxxx
+    # 存储桶名称
+    bucket: xxxxxxxxxxxxxxxxxxxxx
+
+# 阿里云ai配置
+aliYunAi:
+  apikey: xxxxxxxxxxxxxxxxxx
